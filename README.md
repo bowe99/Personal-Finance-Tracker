@@ -1,4 +1,4 @@
-# app_2
+# Personal_Finance_Tracker
 
 A new Flutter project.
 
