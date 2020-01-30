@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
+import './transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -11,10 +11,10 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: 550,
-        child: transactions.isEmpty
-            ? Column(
+    return transactions.isEmpty
+        ? LayoutBuilder(
+            builder: (ctx, constraints) {
+              return Column(
                 children: <Widget>[
                   Text(
                     'No transactions added yet!',
@@ -31,48 +31,19 @@ class TransactionList extends StatelessWidget {
                     ),
                   )
                 ],
-              )
-            : ListView.builder(
-                itemBuilder: (ctx, index) {
-                  return Card(
-                    elevation: 5,
-                    margin: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 5,
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        radius: 30,
-                        child: Container(
-                          padding: EdgeInsets.all(6),
-                          child: FittedBox(
-                            child: Text(
-                              '\$${transactions[index].cost}',
-                            ),
-                          ),
-                        ),
-                      ),
-                      title: Text(
-                        transactions[index].title,
-                        style: Theme.of(context).textTheme.title,
-                      ),
-                      subtitle: Text(
-                        DateFormat.yMMMd()
-                            .format(transactions[index].dateTransaction),
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                        ),
-                        color: Theme.of(context).errorColor,
-                        onPressed: () {
-                          deleteTransaction(transactions[index].id);
-                        },
-                      ),
-                    ),
-                  );
-                },
-                itemCount: transactions.length,
-              ));
+              );
+            },
+          )
+        : ListView(
+            children: <Widget>[
+              ...transactions
+                  .map((tx) => TransactionItem(
+                        key: ValueKey(tx.id),
+                        transaction: tx,
+                        deleteTransaction: deleteTransaction,
+                      ))
+                  .toList()
+            ],
+          );
   }
 }
